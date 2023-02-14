@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:prs/constant.dart';
 // import 'package:dio/dio.dart';
 // import 'package:prs/AnimatedContainerExample.dart';
 
@@ -68,7 +69,7 @@ class test extends StatefulWidget {
 class _testState extends State<test> {
   // Items in the list
 
-  final _items = [];
+  List _items = [];
 
   // The key of the list
   final GlobalKey<AnimatedListState> _key = GlobalKey();
@@ -116,34 +117,30 @@ class _testState extends State<test> {
       appBar: AppBar(
         title: const Text('Kindacode.com'),
       ),
-      body: AnimatedList(
-        key: _key,
-        initialItemCount: 0,
-        padding: const EdgeInsets.all(10),
-        itemBuilder: (_, index, animation) {
-          return SizeTransition(
-            key: UniqueKey(),
-            sizeFactor: animation,
-            child: Card(
-              margin: const EdgeInsets.all(10),
-              elevation: 10,
-              color: Colors.orange,
-              child: ListTile(
-                contentPadding: const EdgeInsets.all(15),
-                title: Text(_items[index]["item_name"],
-                    style: const TextStyle(fontSize: 24)),
-                trailing: IconButton(
-                    icon: const Icon(Icons.delete), onPressed: () => {}
-                    // _removeItem(index),
-                    ),
-              ),
-            ),
-          );
-        },
-      ),
-      // floatingActionButton: FloatingActionButton(
-      //     onPressed: _addItem, child: const Icon(Icons.add)),
+      body: ListView.builder(
+          itemCount: _items.length,
+          itemBuilder: (BuildContext context, index) {
+            var i = index + 1;
+            return GestureDetector(
+                onTap: (() {
+                  var des = {};
+                  des["item_code"] = _items[index]["name"];
+                  des["name"] = _items[index]["item_name"];
+                  des["rate"] = _items[index]["standard_rate"];
+                  selectitem.add(des);
+                  Navigator.pushNamed(context, '/Homescreen');
+                }),
+                child: Card(
+                    elevation: 3,
+                    child: ListTile(
+                        leading: Text(i.toString()),
+                        trailing:
+                            Text(_items[index]["standard_rate"].toString()),
+                        title: Text(_items[index]["item_name"]))));
+          }),
     );
+    // floatingActionButton: FloatingActionButton(
+    //     onPressed: _addItem, child: const Icon(Icons.add)),
   }
 
   Item_List() async {
@@ -156,8 +153,7 @@ class _testState extends State<test> {
         "http://demo14prime.thirvusoft.co.in//api/method/oxo.custom.api.item_list");
 
     setState(() {
-      _items.insert(0, response.data["message"].toString());
-      _key.currentState!.insertItem(0, duration: const Duration(seconds: 1));
+      _items = (response.data["message"]);
     });
   }
 }

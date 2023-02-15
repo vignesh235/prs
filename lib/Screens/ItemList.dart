@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:prs/Screens/bottomnavigation.dart';
 import 'package:prs/constant.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:dio/dio.dart';
 // import 'package:prs/AnimatedContainerExample.dart';
 
@@ -119,41 +122,58 @@ class _testState extends State<test> {
       ),
       body: ListView.builder(
           itemCount: _items.length,
-          itemBuilder: (BuildContext context, index) {
+          itemBuilder: (BuildContext context, int index) {
             var i = index + 1;
             return GestureDetector(
                 onTap: (() {
-                  var des = {};
-                  des["item_code"] = _items[index]["name"];
-                  des["name"] = _items[index]["item_name"];
-                  des["rate"] = _items[index]["standard_rate"];
-                  selectitem.add(des);
-                  Navigator.pushNamed(context, '/Homescreen');
+                  setState(() {
+                    var des = {};
+                    des["item_code"] = _items[index]["name"];
+                    des["name"] = _items[index]["item_name"];
+                    des["rate"] = _items[index]["standard_rate"];
+                    selectitem.add(des);
+                  });
+
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => bottomnavigation()));
                 }),
                 child: Card(
                     elevation: 3,
                     child: ListTile(
                         leading: Text(i.toString()),
-                        trailing:
-                            Text(_items[index]["standard_rate"].toString()),
+                        trailing: Text("₹ : ${_items[index]["standard_rate"]}"),
+                        subtitle: Text("Qty : ${_items[index]["actual_qty"]}"),
                         title: Text(_items[index]["item_name"]))));
           }),
     );
-    // floatingActionButton: FloatingActionButton(
-    //     onPressed: _addItem, child: const Icon(Icons.add)),
   }
 
   Item_List() async {
-    Dio dio = Dio();
-    dio.options.headers = {
-      "Authorization": "token ddc841db67d4231:bb0987569c46dd4",
-    };
+    try {
+      Dio dio = Dio();
+    SharedPreferences Autho = await SharedPreferences.getInstance();
 
-    Response response = await dio.get(
-        "http://demo14prime.thirvusoft.co.in//api/method/oxo.custom.api.item_list");
+      dio.options.headers = {
+        "Authorization": Autho.getString('token') ?? '',
+      };
 
-    setState(() {
-      _items = (response.data["message"]);
-    });
+      Response response = await dio
+          .get("${dotenv.env['API_URL']}/api/method/oxo.custom.api.item_lists");
+      print((response.data["message"]));
+      setState(() {
+        _items = (response.data["message"]);
+      });
+      print(response.data);
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response!.data);
+      } else {
+        print(e.message);
+      }
+    } catch (e) {
+      print(e.toString());
+    }
   }
 }

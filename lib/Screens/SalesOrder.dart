@@ -3,8 +3,13 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:prs/Screens/ItemList.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constant.dart';
 
@@ -17,7 +22,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final formKey = GlobalKey<FormState>();
-  final customer = TextEditingController();
+  final customers = TextEditingController();
   final date = TextEditingController();
   List customerlist_ = [];
   @override
@@ -39,12 +44,11 @@ class _HomePageState extends State<HomePage> {
             Form(
                 key: formKey,
                 child: Column(
-                  
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(15),
                       child: SearchField(
-                        controller: customer,
+                        controller: customers,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please select district';
@@ -73,130 +77,213 @@ class _HomePageState extends State<HomePage> {
                             borderSide:
                                 BorderSide(width: 1, color: Color(0xFF808080)),
                           ),
-                          // border: OutlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(
-                            // borderRadius: BorderRadius.all(Radius.circular(8)),
-                            borderSide: BorderSide(
-                                color: Color(0xFFEB455F), width: 2.0),
-                          ),
+                          prefixIcon: Icon(
+                            PhosphorIcons.user,
+                            color: Colors.grey,
+                          ), // icon is 48px widget.
+
                           labelText: "Customer",
                           // hintText: "Select District"
                         ),
                       ),
                     ),
-                    TextField(
-                      controller: date, //editing controller of this TextField
-                      decoration: InputDecoration(
-                          icon: Icon(Icons.calendar_today), //icon of text field
-                          labelText: "Enter Date" //label text of field
+                    Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: TextField(
+                        controller: date, //editing controller of this TextField
+                        decoration: const InputDecoration(
+                            prefixIcon: Icon(
+                              PhosphorIcons.calendar,
+                              color: Colors.grey,
+                            ),
+                            // icon: Icon(Icons.calendar_today), //icon of text field
+                            labelText: "Enter Date" //label text of field
+                            ),
+                        readOnly:
+                            true, //set it true, so that user will not able to edit text
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(
+                                  2000), //DateTime.now() - not to allow to choose before today.
+                              lastDate: DateTime(2101));
+
+                          if (pickedDate != null) {
+                            print(
+                                pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                            String formattedDate =
+                                DateFormat('yyyy-MM-dd').format(pickedDate);
+                            print(
+                                formattedDate); //formatted date output using intl package =>  2021-03-16
+                            //you can implement different kind of Date Format here according to your requirement
+
+                            setState(() {
+                              date.text =
+                                  formattedDate; //set output date to TextField value.
+                            });
+                          } else {
+                            print("Date is not selected");
+                          }
+                        },
+                      ),
+                    ),
+                    (selectitem.isEmpty)
+                        ? const SizedBox()
+                        : const Text("Selected Item"),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Color(0xffe6f0ff),
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 100.0,
+                              color: Color(0xffe6ecff),
+                              spreadRadius: 1,
+                              offset: Offset(
+                                20,
+                                20,
+                              ),
+                            )
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.height /
+                                  12 *
+                                  selectitem.length,
+                              child: ListView.builder(
+                                  itemCount: selectitem.length,
+                                  shrinkWrap: true,
+                                  itemBuilder: (BuildContext context, index) {
+                                    int i = index + 1;
+                                    String textFieldValue =
+                                        selectitem[index]["qty"] ?? "";
+
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 3),
+                                      child: Card(
+                                          child: ListTile(
+                                              leading: Text(i.toString()),
+                                              trailing: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    selectitem[index]["rate"]
+                                                        .toString(),
+                                                    style: const TextStyle(
+                                                        color:
+                                                            Color(0xFF273b69),
+                                                        fontSize: 15),
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  SizedBox(
+                                                      height: 25,
+                                                      width: 35,
+                                                      child: TextFormField(
+                                                        decoration:
+                                                            const InputDecoration(
+                                                          hintText: "Qty",
+                                                          hintStyle: TextStyle(
+                                                              fontSize: 12),
+                                                          counterText: "",
+                                                        ),
+                                                        maxLength: 3,
+                                                        keyboardType:
+                                                            TextInputType.phone,
+                                                        initialValue:
+                                                            textFieldValue,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            selectitem[index]
+                                                                ["qty"] = value;
+                                                            if (selectitem[
+                                                                        index]
+                                                                    ["qty"] ==
+                                                                "") {
+                                                              setState(() {
+                                                                selectitem
+                                                                    .removeAt(
+                                                                        index);
+                                                              });
+                                                            }
+                                                            print(selectitem);
+                                                          });
+                                                        },
+                                                      )),
+                                                  IconButton(
+                                                      color: const Color(
+                                                          0xff273b69),
+                                                      onPressed: () {
+                                                        print("check");
+                                                        setState(() {
+                                                          selectitem
+                                                              .removeAt(index);
+                                                        });
+                                                      },
+                                                      icon: const Icon(
+                                                          PhosphorIcons
+                                                              .trash_light)),
+                                                ],
+                                              ),
+                                              title: Text(
+                                                  selectitem[index]["name"]))),
+                                    );
+                                  }),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          height: MediaQuery.of(context).size.height / 16,
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(
+                                  width: 1.0, color: Color(0xFF273b69)),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => test()),
+                              );
+                            },
+                            child: const Text('Add Item'),
                           ),
-                      readOnly:
-                          true, //set it true, so that user will not able to edit text
-                      onTap: () async {
-                        DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(
-                                2000), //DateTime.now() - not to allow to choose before today.
-                            lastDate: DateTime(2101));
-
-                        if (pickedDate != null) {
-                          print(
-                              pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
-                          String formattedDate =
-                              DateFormat('yyyy-MM-dd').format(pickedDate);
-                          print(
-                              formattedDate); //formatted date output using intl package =>  2021-03-16
-                          //you can implement different kind of Date Format here according to your requirement
-
-                          setState(() {
-                            date.text =
-                                formattedDate; //set output date to TextField value.
-                          });
-                        } else {
-                          print("Date is not selected");
-                        }
-                      },
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height /
-                          12 *
-                          selectitem.length,
-                      child: ListView.builder(
-                          itemCount: selectitem.length,
-                          itemBuilder: (BuildContext context, index) {
-                            String textFieldValue =
-                                selectitem[index]["qty"] ?? "";
-
-                            return Card(
-                                child: ListTile(
-                                    leading: const Icon(Icons.list),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          selectitem[index]["rate"].toString(),
-                                          style: const TextStyle(
-                                              color: Colors.green,
-                                              fontSize: 15),
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        SizedBox(
-                                            height: 25,
-                                            width: 25,
-                                            child: TextFormField(
-                                              initialValue: textFieldValue,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  selectitem[index]["qty"] =
-                                                      value;
-                                                  if (selectitem[index]
-                                                          ["qty"] ==
-                                                      "") {
-                                                    setState(() {
-                                                      selectitem
-                                                          .removeAt(index);
-                                                    });
-                                                  }
-                                                  print(selectitem);
-                                                });
-                                              },
-                                            )),
-                                        IconButton(
-                                            onPressed: () {
-                                              print("check");
-                                              setState(() {
-                                                selectitem.removeAt(index);
-                                              });
-                                            },
-                                            icon: const Icon(Icons.delete)),
-                                      ],
-                                    ),
-                                    title: Text(selectitem[index]["name"])));
-                          }),
-                    ),
-                    // Text(selectitem.toString()),
-                    OutlinedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/ItemList');
-                      },
-                      child: const Text('Add Item'),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(),
-                      onPressed: () {
-                        print(customer.text);
-                        print(date.text);
-                        print(selectitem);
-                        login(
-                            customer.text, date.text, json.encode(selectitem));
-                        print("object");
-                      },
-                      child: const Text('  Login  '),
-                    ),
+                        ),
+                        const SizedBox(
+                          width: 18,
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          height: MediaQuery.of(context).size.height / 16,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(),
+                            onPressed: () {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              print(customers.text);
+                              print(date.text);
+                              print(selectitem);
+                              login(customers.text, date.text,
+                                  json.encode(selectitem));
+                              print("object");
+                            },
+                            child: const Text('  Submit  '),
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 )),
           ],
@@ -204,12 +291,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   customerlist() async {
+    SharedPreferences Autho = await SharedPreferences.getInstance();
     Dio dio = Dio();
     dio.options.headers = {
-      "Authorization": "token ddc841db67d4231:bb0987569c46dd4",
+      "Authorization": Autho.getString('token') ?? '',
     };
     Response response = await dio.get(
-        "http://demo14prime.thirvusoft.co.in//api/method/oxo.custom.api.customer_list");
+        "${dotenv.env['API_URL']}/api/method/oxo.custom.api.customer_list");
     setState(() {
       customerlist_ = (response.data["message"]);
     });
@@ -218,18 +306,39 @@ class _HomePageState extends State<HomePage> {
   login(customer, date, item) async {
     print(item);
     print("object");
+    SharedPreferences Autho = await SharedPreferences.getInstance();
+
     try {
       var dio = Dio();
       dio.options.headers = {
-        "Authorization": "token ddc841db67d4231:bb0987569c46dd4",
+        "Authorization": Autho.getString('token') ?? '',
       };
       var url =
-          'http://demo14prime.thirvusoft.co.in//api/method/oxo.custom.api.sales_order';
+          '${dotenv.env['API_URL']}/api/method/oxo.custom.api.sales_order';
       var data = {'cus_name': customer, 'items': item, 'delivery_date': date};
       print(data);
 
       var response = await dio.post(url, data: data);
+      print(response.statusCode);
       print(response.data);
+      if (response.statusCode == 200) {
+        var responseData = response.data;
+        Fluttertoast.showToast(
+            msg: responseData["message"].toString(),
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Color(0xFF273b69),
+            textColor: Colors.white,
+            fontSize: 16.0);
+        selectitem.clear();
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response!.data);
+      } else {
+        print(e.message);
+      }
     } catch (e) {
       print(e);
     }

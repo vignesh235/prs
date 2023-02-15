@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
+        scaffoldBackgroundColor: const Color(0xFFffffff),
         //google fonts lato theme...
         textTheme: GoogleFonts.poppinsTextTheme(
           Theme.of(context).textTheme,
@@ -25,15 +25,18 @@ class MyApp extends StatelessWidget {
         primarySwatch: createMaterialColor(const Color(0xFF273b69)),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: '/',
+      // initialRoute: '/',
       routes: {
-        '/Homescreen': (context) => const HomePage(),
-        '/ItemList': (context) => const test(),
-        '/bottomsheeet': (context) => const MainPage(),
+        // '/': (context) => HomePage(),
+
+        '/homescreen': (context) => const HomePage(),
+        '/detail': (context) => test(),
+        // '/itemlist': (context) => test(),
+        '/bottomsheeet': (context) => bottomnavigation(),
       },
       title: 'My App',
       debugShowCheckedModeBanner: false,
-      home: const LoginPage(),
+      home: const splashscreen(),
     );
   }
 

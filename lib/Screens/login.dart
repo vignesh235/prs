@@ -19,7 +19,16 @@ class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
   final mobilenumber = TextEditingController();
   final password = TextEditingController();
+  bool isHidden = true;
+  bool loding = false;
+
   @override
+  void togglePasswordView() {
+    setState(() {
+      isHidden = !isHidden;
+    });
+  }
+
   initState() {
     // ignore: avoid_print
     super.initState();
@@ -70,6 +79,13 @@ class _LoginPageState extends State<LoginPage> {
               Padding(
                 padding: const EdgeInsets.all(15),
                 child: TextFormField(
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Enter a valid mobile number!';
+                    }
+                    return null;
+                  },
                   decoration: const InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -77,9 +93,10 @@ class _LoginPageState extends State<LoginPage> {
                             const BorderSide(color: Colors.white, width: 0.0),
                       ),
                       suffix: Icon(
-                        PhosphorIcons.envelope,
+                        PhosphorIcons.phone_light,
                         color: Color.fromARGB(255, 15, 15, 15),
                       ),
+                      hintText: "Mobile Number",
                       isDense: true,
                       filled: true,
                       fillColor: Color(0xFFf0f1f5),
@@ -90,26 +107,37 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(
-                height: 25,
+                height: 20,
               ),
               Padding(
                 padding: const EdgeInsets.all(15),
                 child: TextFormField(
+                  obscureText: isHidden,
                   controller: password,
-                  decoration: const InputDecoration(
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Enter a valid password!';
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
-                        borderSide:
-                            const BorderSide(color: Colors.white, width: 0.0),
+                        borderSide: BorderSide(color: Colors.white, width: 0.0),
                       ),
-                      suffix: Icon(
-                        PhosphorIcons.password,
-                        color: Color.fromARGB(255, 15, 15, 15),
+                      suffix: InkWell(
+                        onTap: togglePasswordView,
+                        child: Icon(
+                          isHidden
+                              ? PhosphorIcons.eye_slash_light
+                              : PhosphorIcons.eye_light,
+                        ),
                       ),
                       isDense: true,
                       filled: true,
+                      hintText: "Password",
                       fillColor: Color(0xFFf0f1f5),
-                      border: OutlineInputBorder(
+                      border: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                       )),
                 ),
@@ -127,10 +155,20 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(18.0),
                   ))),
                   onPressed: () {
-                    print("object");
-                    login(mobilenumber.text, password.text);
+                    if (formKey.currentState!.validate()) {
+                      print("object");
+                      setState(() {
+                        loding = true;
+                      });
+                      login(mobilenumber.text, password.text);
+                    }
                   },
-                  child: const Text('  Log in  '),
+                  child: loding
+                      ? const CircularProgressIndicator(
+                          backgroundColor: Colors.white,
+                          valueColor: AlwaysStoppedAnimation(Colors.green),
+                        )
+                      : const Text('  Log in  '),
                 ),
               ),
             ],
@@ -146,23 +184,40 @@ class _LoginPageState extends State<LoginPage> {
 
     var data = {"mobile": mobilenumber, "password": password};
 
-    Response response = await dio.post(
+    Response response = await dio.get(
         "http://demo14prime.thirvusoft.co.in//api/method/oxo.custom.api.login",
         queryParameters: data);
     var responseData = response.data;
     print(response.data["token"]);
     Autho.setString('token', response.data['token'] ?? "");
+    Autho.setString('full_name', response.data['full_name'] ?? "");
     print(responseData);
+
     if (responseData["message"] == "Logined Sucessfully") {
       Fluttertoast.showToast(
           msg: responseData["message"].toString(),
           toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
+          gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF273b69),
           textColor: Colors.white,
           fontSize: 16.0);
+      setState(() {
+        loding = false;
+      });
       Navigator.pushNamed(context, '/bottomsheeet');
+    } else {
+      setState(() {
+        loding = false;
+      });
+      Fluttertoast.showToast(
+          msg: responseData["message"].toString(),
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.redAccent,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 }

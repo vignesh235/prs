@@ -1,68 +1,99 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
-
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:prs/Screens/Dashboard.dart';
 import 'package:prs/Screens/SalesOrder.dart';
+import 'package:prs/constant.dart';
 
-class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 
-  @override
-  State<MainPage> createState() => _MainPageState();
+import 'package:flutter/material.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+
+import 'Customer.dart';
+
+void main() {
+  runApp(bottomnavigation());
 }
 
-class _MainPageState extends State<MainPage> {
-  Color mainColor = const Color(0xFFff3341);
-  final PersistentTabController _controller =
-      PersistentTabController(initialIndex: 0);
-
+class bottomnavigation extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: PersistentTabView(
-        context,
-        controller: _controller,
-        screens: const [
-          Dashboard(),
-          HomePage(),
-        ],
-        navBarHeight: 50,
-        items: _navBarsItems(),
-        bottomScreenMargin: 0,
-        resizeToAvoidBottomInset: true,
+  _bottomnavigationState createState() => _bottomnavigationState();
+}
 
-        // navBarStyle: NavBarStyle.style12,
-        // navBarStyle: NavBarStyle.style9,
-        // navBarStyle: NavBarStyle.style7,
-        // navBarStyle: NavBarStyle.style10,
-        navBarStyle: NavBarStyle.style12,
-        // navBarStyle: NavBarStyle.style13,
-        // navBarStyle: NavBarStyle.style3,
-        // navBarStyle: NavBarStyle.style6,
-      ),
-    );
+class _bottomnavigationState extends State<bottomnavigation> {
+  void _onItemTapped(int index) {
+    setState(() {
+      currentIndex = index;
+    });
   }
 
-  List<PersistentBottomNavBarItem> _navBarsItems() {
-    return [
-      PersistentBottomNavBarItem(
-        icon: Icon(
-          PhosphorIcons.house,
-        ),
-        title: ("Home"),
-        activeColorPrimary: mainColor,
-        inactiveColorPrimary: CupertinoColors.systemGrey,
+  List<Widget> _widgetOptions = <Widget>[
+    Dashboard(),
+    HomePage(),
+    customer(),
+  ];
+  @override
+  Widget build(BuildContext context) {
+    double screenwidth = MediaQuery.of(context).size.width;
+    return Scaffold(
+      bottomNavigationBar: SalomonBottomBar(
+        currentIndex: currentIndex,
+        // onTap: (i) => setState(() => currentIndex = i,),
+        onTap: (i) => setState(() {
+          currentIndex = i;
+        }),
+        items: [
+          SalomonBottomBarItem(
+            icon: Icon(
+              PhosphorIcons.list_dashes,
+              size: screenwidth <= 360 ? 20 : 23,
+            ),
+            title: Text(
+              "Dashboard",
+              style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                    fontSize: screenwidth <= 360 ? 9 : 10.5,
+                    letterSpacing: .2,
+                    color: Color(0xff19183e)),
+              ),
+            ),
+            selectedColor: Color(0xffE19183E),
+          ),
+          SalomonBottomBarItem(
+            icon: Icon(
+              PhosphorIcons.shopping_cart_light,
+              size: screenwidth <= 360 ? 20 : 23,
+            ),
+            title: Text(
+              "Sales Order",
+              style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                    fontSize: screenwidth <= 360 ? 9 : 10.5,
+                    letterSpacing: .2,
+                    color: Color(0xff19183e)),
+              ),
+            ),
+            selectedColor: Color(0xffE19183E),
+          ),
+          SalomonBottomBarItem(
+            icon: Icon(
+              PhosphorIcons.receipt_light,
+              size: screenwidth <= 360 ? 20 : 23,
+            ),
+            title: Text(
+              "Material Request",
+              style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                    fontSize: screenwidth <= 360 ? 9 : 10.5,
+                    letterSpacing: .3,
+                    color: Color(0xff19183e)),
+              ),
+            ),
+            selectedColor: Color(0xffE19183E),
+          ),
+        ],
       ),
-      PersistentBottomNavBarItem(
-        icon: Icon(
-          PhosphorIcons.shopping_cart,
-        ),
-        title: ("Search"),
-        activeColorPrimary: mainColor,
-        inactiveColorPrimary: CupertinoColors.systemGrey,
-      ),
-    ];
+      body: _widgetOptions.elementAt(currentIndex),
+    );
   }
 }

@@ -49,6 +49,7 @@ dependencies:
   salomon_bottom_bar: ^3.3.1
   percent_indicator: ^4.2.2
   animated_widgets: ^1.1.0
+  flutter_launcher_icons: ^0.11.0
 
 dev_dependencies:
   flutter_test:
@@ -76,7 +77,10 @@ flutter:
   assets:
       - .env
       - assets/
-
+flutter_icons:
+    android: true
+    ios: true
+    image_path: 'assets/Sales Pro1.png'
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

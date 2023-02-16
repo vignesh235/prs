@@ -22,9 +22,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final formKey = GlobalKey<FormState>();
-  final customers = TextEditingController();
-  final date = TextEditingController();
-  List customerlist_ = [];
+  bool total_amount_visible = false;
   @override
   initState() {
     // ignore: avoid_print
@@ -37,7 +35,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('  '),
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          title: const Text(' Sales Order '),
         ),
         body: ListView(
           children: [
@@ -275,15 +275,23 @@ class _HomePageState extends State<HomePage> {
                               print(customers.text);
                               print(date.text);
                               print(selectitem);
+
                               login(customers.text, date.text,
                                   json.encode(selectitem));
+
                               print("object");
                             },
                             child: const Text('  Submit  '),
                           ),
                         ),
                       ],
-                    )
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    Visibility(
+                        visible: total_amount_visible,
+                        child: Text("Total Amount: " + totalamount))
                   ],
                 )),
           ],
@@ -322,7 +330,13 @@ class _HomePageState extends State<HomePage> {
       print(response.statusCode);
       print(response.data);
       if (response.statusCode == 200) {
+        setState(() {
+          total_amount_visible = true;
+        });
+
         var responseData = response.data;
+        totalamount = responseData["Total"].toString();
+
         Fluttertoast.showToast(
             msg: responseData["message"].toString(),
             toastLength: Toast.LENGTH_SHORT,
@@ -331,7 +345,7 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: Color(0xFF273b69),
             textColor: Colors.white,
             fontSize: 16.0);
-        selectitem.clear();
+        cleardata();
       }
     } on DioError catch (e) {
       if (e.response != null) {
@@ -342,5 +356,17 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       print(e);
     }
+  }
+
+  cleardata() {
+    Timer(const Duration(seconds: 4), () {
+      setState(() {
+        customers.clear();
+        date.clear();
+        selectitem.clear();
+
+        total_amount_visible = false;
+      });
+    });
   }
 }

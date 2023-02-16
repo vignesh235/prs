@@ -118,7 +118,8 @@ class _testState extends State<test> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kindacode.com'),
+        centerTitle: true,
+        title: const Text('Select Ttem'),
       ),
       body: ListView.builder(
           itemCount: _items.length,
@@ -133,11 +134,11 @@ class _testState extends State<test> {
                     des["rate"] = _items[index]["standard_rate"];
                     selectitem.add(des);
                   });
-
-                  Navigator.push(
+                  Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => bottomnavigation()));
+                          builder: (BuildContext context) =>
+                              bottomnavigation()));
                 }),
                 child: Card(
                     elevation: 3,
@@ -153,7 +154,7 @@ class _testState extends State<test> {
   Item_List() async {
     try {
       Dio dio = Dio();
-    SharedPreferences Autho = await SharedPreferences.getInstance();
+      SharedPreferences Autho = await SharedPreferences.getInstance();
 
       dio.options.headers = {
         "Authorization": Autho.getString('token') ?? '',

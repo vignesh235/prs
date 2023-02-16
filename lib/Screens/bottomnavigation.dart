@@ -77,11 +77,11 @@ class _bottomnavigationState extends State<bottomnavigation> {
           ),
           SalomonBottomBarItem(
             icon: Icon(
-              PhosphorIcons.receipt_light,
+              PhosphorIcons.user_plus_light,
               size: screenwidth <= 360 ? 20 : 23,
             ),
             title: Text(
-              "Material Request",
+              "Customer",
               style: GoogleFonts.poppins(
                 textStyle: TextStyle(
                     fontSize: screenwidth <= 360 ? 9 : 10.5,

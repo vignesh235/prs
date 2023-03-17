@@ -506,6 +506,7 @@ class _customerState extends State<customer> {
         'Manual_Data': '',
         'user': Autho.getString('full_name').toString(),
         'pincode': pincode,
+        "state": state
       };
 
       // Make the request

@@ -23,11 +23,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final formKey = GlobalKey<FormState>();
   bool total_amount_visible = false;
+  int length = 0;
 
   @override
   initState() {
     // ignore: avoid_print
     super.initState();
+    _floatprecision();
     customerlist();
     print("initState Called");
   }
@@ -202,8 +204,10 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                   SizedBox(
                                                       height: 25,
-                                                      width: 35,
-                                                      child: TextFormField(
+                                                      width: 60,
+                                                      child: 
+                                                      
+                                                      TextFormField(
                                                         decoration:
                                                             const InputDecoration(
                                                           hintText: "Qty",
@@ -211,7 +215,9 @@ class _HomePageState extends State<HomePage> {
                                                               fontSize: 12),
                                                           counterText: "",
                                                         ),
-                                                        maxLength: 3,
+                                                        maxLength: (length > 0)
+                                                            ? length
+                                                            : 4,
                                                         keyboardType:
                                                             TextInputType.phone,
                                                         initialValue:
@@ -247,22 +253,23 @@ class _HomePageState extends State<HomePage> {
                                                             print(itemTotal);
                                                             print(
                                                                 finaltotalamount_);
-                                                            if (selectitem[
-                                                                        index]
-                                                                    ["qty"] ==
-                                                                "") {
-                                                              setState(() {
-                                                                selectitem
-                                                                    .removeAt(
-                                                                        index);
-                                                              });
-                                                            }
+                                                            // if (selectitem[
+                                                            //             index]
+                                                            //         ["qty"] ==
+                                                            //     "") {
+                                                            //   setState(() {
+                                                            //     selectitem
+                                                            //         .removeAt(
+                                                            //             index);
+                                                            //   });
+                                                            // }
 
                                                             // Print the updated list of items
                                                             print(selectitem);
                                                           });
                                                         },
-                                                      )),
+                                                      )
+                                                      ),
                                                   IconButton(
                                                       color: const Color(
                                                           0xff273b69),
@@ -355,10 +362,10 @@ class _HomePageState extends State<HomePage> {
                       height: 25,
                     ),
                     Text("Total Amount: $totalamount_"),
-                    Text("Total Amount: $finaltotalamount_"),
+                    Text("Total Amount${finaltotalamount_.toStringAsFixed(2)}"),
                     Visibility(
                         visible: total_amount_visible,
-                        child: Text("Total Amount: $totalamount"))
+                        child: Text("Total Amount:  $totalamount"))
                   ],
                 )),
           ],
@@ -376,6 +383,20 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       customerlist_ = (response.data["message"]);
     });
+  }
+
+  Future<int> _floatprecision() async {
+    SharedPreferences Autho = await SharedPreferences.getInstance();
+    Dio dio = Dio();
+    dio.options.headers = {
+      "Authorization": Autho.getString('token') ?? '',
+    };
+    Response response = await dio.get(
+        "${dotenv.env['API_URL']}/api/method/frappe.client.get_value?doctype=System%20Settings&fieldname=float_precision");
+    setState(() {
+      length = int.parse(response.data["message"]["float_precision"]);
+    });
+    return length;
   }
 
   login(customer, date, item, paidamount) async {

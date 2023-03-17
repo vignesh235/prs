@@ -14,3 +14,6 @@ var totalamount = "";
 double totalamount_ = 0.0;
 double finaltotalamount_ = 0.0;
 String textFieldValue = "";
+String textFieldValuem = "";
+
+List metrialitem = [];

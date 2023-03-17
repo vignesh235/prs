@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 import 'Customer.dart';
+import 'Expensepage.dart';
 
 void main() {
   runApp(bottomnavigation());
@@ -31,6 +32,7 @@ class _bottomnavigationState extends State<bottomnavigation> {
   List<Widget> _widgetOptions = <Widget>[
     const Dashboard(),
     const HomePage(),
+    const materialrequest(),
     const customer(),
   ];
   @override
@@ -71,6 +73,22 @@ class _bottomnavigationState extends State<bottomnavigation> {
                 textStyle: TextStyle(
                     fontSize: screenwidth <= 360 ? 9 : 10.5,
                     letterSpacing: .2,
+                    color: Color(0xff19183e)),
+              ),
+            ),
+            selectedColor: Color(0xffE19183E),
+          ),
+          SalomonBottomBarItem(
+            icon: Icon(
+              PhosphorIcons.note_pencil,
+              size: screenwidth <= 360 ? 20 : 23,
+            ),
+            title: Text(
+              "Material request",
+              style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                    fontSize: screenwidth <= 360 ? 9 : 10.5,
+                    letterSpacing: .3,
                     color: Color(0xff19183e)),
               ),
             ),

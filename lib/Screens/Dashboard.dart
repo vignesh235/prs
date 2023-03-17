@@ -79,7 +79,7 @@ class _DashboardState extends State<Dashboard> {
               animationDuration: 1200,
               radius: 60.0,
               lineWidth: 15.0,
-              percent: totalAmountp,
+              percent: totalAmountp / 100,
               center: CustomAnimatedWidget(
                 duration: Duration(milliseconds: 1200),
                 curve: Curves.easeOut,
@@ -115,8 +115,11 @@ class _DashboardState extends State<Dashboard> {
       setState(() {
         soCount = data["so_count"];
         totalAmount = data["total_amount"];
+        print(totalAmount);
         value = soCount / 100;
-        totalAmountp = totalAmount / 100000;
+        print(value);
+        totalAmountp = (totalAmount / 1000000.0) * 100;
+
         print(totalAmountp);
       });
 

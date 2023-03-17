@@ -23,6 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final formKey = GlobalKey<FormState>();
   bool total_amount_visible = false;
+
   @override
   initState() {
     // ignore: avoid_print
@@ -97,7 +98,7 @@ class _HomePageState extends State<HomePage> {
                               color: Colors.grey,
                             ),
                             // icon: Icon(Icons.calendar_today), //icon of text field
-                            labelText: "Enter Date" //label text of field
+                            labelText: "Date" //label text of field
                             ),
                         readOnly:
                             true, //set it true, so that user will not able to edit text
@@ -126,6 +127,19 @@ class _HomePageState extends State<HomePage> {
                             print("Date is not selected");
                           }
                         },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: TextField(
+                        controller: paidamount_,
+                        decoration: const InputDecoration(
+                            prefixIcon: Icon(
+                              PhosphorIcons.currency_inr,
+                              color: Colors.grey,
+                            ),
+                            labelText: "Paid amount" //label text of field
+                            ),
                       ),
                     ),
                     (selectitem.isEmpty)
@@ -159,10 +173,12 @@ class _HomePageState extends State<HomePage> {
                               child: ListView.builder(
                                   itemCount: selectitem.length,
                                   shrinkWrap: true,
+                                  key: UniqueKey(),
                                   itemBuilder: (BuildContext context, index) {
                                     int i = index + 1;
-                                    String textFieldValue =
+                                    textFieldValue =
                                         selectitem[index]["qty"] ?? "";
+                                    print(selectitem);
 
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(
@@ -202,8 +218,35 @@ class _HomePageState extends State<HomePage> {
                                                             textFieldValue,
                                                         onChanged: (value) {
                                                           setState(() {
+                                                            print(selectitem[
+                                                                index]["name"]);
+                                                            double prevQty =
+                                                                double.tryParse(
+                                                                        selectitem[index]["qty"] ??
+                                                                            "0") ??
+                                                                    0.0;
                                                             selectitem[index]
                                                                 ["qty"] = value;
+                                                            print(selectitem[
+                                                                index]["qty"]);
+                                                            double newQty =
+                                                                double.tryParse(
+                                                                        selectitem[index]["qty"] ??
+                                                                            "0") ??
+                                                                    0.0;
+                                                            double rate =
+                                                                selectitem[
+                                                                        index]
+                                                                    ["rate"];
+                                                            double itemTotal =
+                                                                (newQty -
+                                                                        prevQty) *
+                                                                    rate;
+                                                            finaltotalamount_ +=
+                                                                itemTotal;
+                                                            print(itemTotal);
+                                                            print(
+                                                                finaltotalamount_);
                                                             if (selectitem[
                                                                         index]
                                                                     ["qty"] ==
@@ -214,6 +257,8 @@ class _HomePageState extends State<HomePage> {
                                                                         index);
                                                               });
                                                             }
+
+                                                            // Print the updated list of items
                                                             print(selectitem);
                                                           });
                                                         },
@@ -224,9 +269,29 @@ class _HomePageState extends State<HomePage> {
                                                       onPressed: () {
                                                         print("check");
                                                         setState(() {
+                                                          double newQty = double
+                                                                  .tryParse(selectitem[
+                                                                              index]
+                                                                          [
+                                                                          "qty"] ??
+                                                                      "0") ??
+                                                              0.0;
+                                                          double rate =
+                                                              selectitem[index]
+                                                                  ["rate"];
+                                                          finaltotalamount_ =
+                                                              finaltotalamount_ -
+                                                                  (newQty) *
+                                                                      rate;
                                                           selectitem
                                                               .removeAt(index);
+                                                          textFieldValue =
+                                                              newQty.toString();
                                                         });
+                                                        print(
+                                                            "00000000000000000000000000000000000000000000000000000");
+                                                        print(selectitem);
+                                                        print(textFieldValue);
                                                       },
                                                       icon: const Icon(
                                                           PhosphorIcons
@@ -277,7 +342,7 @@ class _HomePageState extends State<HomePage> {
                               print(selectitem);
 
                               login(customers.text, date.text,
-                                  json.encode(selectitem));
+                                  json.encode(selectitem), paidamount_.text);
 
                               print("object");
                             },
@@ -289,9 +354,11 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(
                       height: 25,
                     ),
+                    Text("Total Amount: $totalamount_"),
+                    Text("Total Amount: $finaltotalamount_"),
                     Visibility(
                         visible: total_amount_visible,
-                        child: Text("Total Amount: " + totalamount))
+                        child: Text("Total Amount: $totalamount"))
                   ],
                 )),
           ],
@@ -311,7 +378,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  login(customer, date, item) async {
+  login(customer, date, item, paidamount) async {
     print(item);
     print("object");
     SharedPreferences Autho = await SharedPreferences.getInstance();
@@ -323,7 +390,12 @@ class _HomePageState extends State<HomePage> {
       };
       var url =
           '${dotenv.env['API_URL']}/api/method/oxo.custom.api.sales_order';
-      var data = {'cus_name': customer, 'items': item, 'delivery_date': date};
+      var data = {
+        'cus_name': customer,
+        'items': item,
+        'delivery_date': date,
+        'amount': paidamount
+      };
       print(data);
 
       var response = await dio.post(url, data: data);
@@ -364,6 +436,7 @@ class _HomePageState extends State<HomePage> {
         customers.clear();
         date.clear();
         selectitem.clear();
+        finaltotalamount_ = 0.0;
 
         total_amount_visible = false;
       });

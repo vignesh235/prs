@@ -49,9 +49,15 @@ class _customerState extends State<customer> {
     setState(() {
       custbutton = true;
     });
+    temp();
     // TODO: implement initState
     statelist_();
     // territory_list();
+  }
+
+  temp() async {
+    SharedPreferences Autho = await SharedPreferences.getInstance();
+    print(Autho.getString('token'));
   }
 
   Widget build(BuildContext context) {

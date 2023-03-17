@@ -27,10 +27,11 @@ class _bottomnavigationState extends State<bottomnavigation> {
     });
   }
 
+  // ignore: prefer_final_fields
   List<Widget> _widgetOptions = <Widget>[
-    Dashboard(),
-    HomePage(),
-    customer(),
+    const Dashboard(),
+    const HomePage(),
+    const customer(),
   ];
   @override
   Widget build(BuildContext context) {

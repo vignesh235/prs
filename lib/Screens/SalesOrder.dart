@@ -22,13 +22,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final formKey = GlobalKey<FormState>();
-  final customers = TextEditingController();
-  final date = TextEditingController();
-  List customerlist_ = [];
+  bool total_amount_visible = false;
+  int length = 0;
+
   @override
   initState() {
     // ignore: avoid_print
     super.initState();
+    _floatprecision();
     customerlist();
     print("initState Called");
   }
@@ -37,7 +38,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('  '),
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          title: const Text(' Sales Order '),
         ),
         body: ListView(
           children: [
@@ -97,7 +100,7 @@ class _HomePageState extends State<HomePage> {
                               color: Colors.grey,
                             ),
                             // icon: Icon(Icons.calendar_today), //icon of text field
-                            labelText: "Enter Date" //label text of field
+                            labelText: "Date" //label text of field
                             ),
                         readOnly:
                             true, //set it true, so that user will not able to edit text
@@ -126,6 +129,19 @@ class _HomePageState extends State<HomePage> {
                             print("Date is not selected");
                           }
                         },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: TextField(
+                        controller: paidamount_,
+                        decoration: const InputDecoration(
+                            prefixIcon: Icon(
+                              PhosphorIcons.currency_inr,
+                              color: Colors.grey,
+                            ),
+                            labelText: "Paid amount" //label text of field
+                            ),
                       ),
                     ),
                     (selectitem.isEmpty)
@@ -159,10 +175,12 @@ class _HomePageState extends State<HomePage> {
                               child: ListView.builder(
                                   itemCount: selectitem.length,
                                   shrinkWrap: true,
+                                  key: UniqueKey(),
                                   itemBuilder: (BuildContext context, index) {
                                     int i = index + 1;
-                                    String textFieldValue =
+                                    textFieldValue =
                                         selectitem[index]["qty"] ?? "";
+                                    print(selectitem);
 
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(
@@ -186,8 +204,10 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                   SizedBox(
                                                       height: 25,
-                                                      width: 35,
-                                                      child: TextFormField(
+                                                      width: 60,
+                                                      child: 
+                                                      
+                                                      TextFormField(
                                                         decoration:
                                                             const InputDecoration(
                                                           hintText: "Qty",
@@ -195,38 +215,90 @@ class _HomePageState extends State<HomePage> {
                                                               fontSize: 12),
                                                           counterText: "",
                                                         ),
-                                                        maxLength: 3,
+                                                        maxLength: (length > 0)
+                                                            ? length
+                                                            : 4,
                                                         keyboardType:
                                                             TextInputType.phone,
                                                         initialValue:
                                                             textFieldValue,
                                                         onChanged: (value) {
                                                           setState(() {
+                                                            print(selectitem[
+                                                                index]["name"]);
+                                                            double prevQty =
+                                                                double.tryParse(
+                                                                        selectitem[index]["qty"] ??
+                                                                            "0") ??
+                                                                    0.0;
                                                             selectitem[index]
                                                                 ["qty"] = value;
-                                                            if (selectitem[
+                                                            print(selectitem[
+                                                                index]["qty"]);
+                                                            double newQty =
+                                                                double.tryParse(
+                                                                        selectitem[index]["qty"] ??
+                                                                            "0") ??
+                                                                    0.0;
+                                                            double rate =
+                                                                selectitem[
                                                                         index]
-                                                                    ["qty"] ==
-                                                                "") {
-                                                              setState(() {
-                                                                selectitem
-                                                                    .removeAt(
-                                                                        index);
-                                                              });
-                                                            }
+                                                                    ["rate"];
+                                                            double itemTotal =
+                                                                (newQty -
+                                                                        prevQty) *
+                                                                    rate;
+                                                            finaltotalamount_ +=
+                                                                itemTotal;
+                                                            print(itemTotal);
+                                                            print(
+                                                                finaltotalamount_);
+                                                            // if (selectitem[
+                                                            //             index]
+                                                            //         ["qty"] ==
+                                                            //     "") {
+                                                            //   setState(() {
+                                                            //     selectitem
+                                                            //         .removeAt(
+                                                            //             index);
+                                                            //   });
+                                                            // }
+
+                                                            // Print the updated list of items
                                                             print(selectitem);
                                                           });
                                                         },
-                                                      )),
+                                                      )
+                                                      ),
                                                   IconButton(
                                                       color: const Color(
                                                           0xff273b69),
                                                       onPressed: () {
                                                         print("check");
                                                         setState(() {
+                                                          double newQty = double
+                                                                  .tryParse(selectitem[
+                                                                              index]
+                                                                          [
+                                                                          "qty"] ??
+                                                                      "0") ??
+                                                              0.0;
+                                                          double rate =
+                                                              selectitem[index]
+                                                                  ["rate"];
+                                                          finaltotalamount_ =
+                                                              finaltotalamount_ -
+                                                                  (newQty) *
+                                                                      rate;
                                                           selectitem
                                                               .removeAt(index);
+                                                          textFieldValue =
+                                                              newQty.toString();
                                                         });
+                                                        print(
+                                                            "00000000000000000000000000000000000000000000000000000");
+                                                        print(selectitem);
+                                                        print(textFieldValue);
                                                       },
                                                       icon: const Icon(
                                                           PhosphorIcons
@@ -275,15 +347,25 @@ class _HomePageState extends State<HomePage> {
                               print(customers.text);
                               print(date.text);
                               print(selectitem);
+
                               login(customers.text, date.text,
-                                  json.encode(selectitem));
+                                  json.encode(selectitem), paidamount_.text);
+
                               print("object");
                             },
                             child: const Text('  Submit  '),
                           ),
                         ),
                       ],
-                    )
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    Text("Total Amount: $totalamount_"),
+                    Text("Total Amount${finaltotalamount_.toStringAsFixed(2)}"),
+                    Visibility(
+                        visible: total_amount_visible,
+                        child: Text("Total Amount:  $totalamount"))
                   ],
                 )),
           ],
@@ -303,7 +385,21 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  login(customer, date, item) async {
+  Future<int> _floatprecision() async {
+    SharedPreferences Autho = await SharedPreferences.getInstance();
+    Dio dio = Dio();
+    dio.options.headers = {
+      "Authorization": Autho.getString('token') ?? '',
+    };
+    Response response = await dio.get(
+        "${dotenv.env['API_URL']}/api/method/frappe.client.get_value?doctype=System%20Settings&fieldname=float_precision");
+    setState(() {
+      length = int.parse(response.data["message"]["float_precision"]);
+    });
+    return length;
+  }
+
+  login(customer, date, item, paidamount) async {
     print(item);
     print("object");
     SharedPreferences Autho = await SharedPreferences.getInstance();
@@ -315,14 +411,25 @@ class _HomePageState extends State<HomePage> {
       };
       var url =
           '${dotenv.env['API_URL']}/api/method/oxo.custom.api.sales_order';
-      var data = {'cus_name': customer, 'items': item, 'delivery_date': date};
+      var data = {
+        'cus_name': customer,
+        'items': item,
+        'delivery_date': date,
+        'amount': paidamount
+      };
       print(data);
 
       var response = await dio.post(url, data: data);
       print(response.statusCode);
       print(response.data);
       if (response.statusCode == 200) {
+        setState(() {
+          total_amount_visible = true;
+        });
+
         var responseData = response.data;
+        totalamount = responseData["Total"].toString();
+
         Fluttertoast.showToast(
             msg: responseData["message"].toString(),
             toastLength: Toast.LENGTH_SHORT,
@@ -331,7 +438,7 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: Color(0xFF273b69),
             textColor: Colors.white,
             fontSize: 16.0);
-        selectitem.clear();
+        cleardata();
       }
     } on DioError catch (e) {
       if (e.response != null) {
@@ -342,5 +449,18 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       print(e);
     }
+  }
+
+  cleardata() {
+    Timer(const Duration(seconds: 4), () {
+      setState(() {
+        customers.clear();
+        date.clear();
+        selectitem.clear();
+        finaltotalamount_ = 0.0;
+
+        total_amount_visible = false;
+      });
+    });
   }
 }

@@ -15,6 +15,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'dart:math';
 
+import '../constant.dart';
+
 class customer extends StatefulWidget {
   const customer({super.key});
 
@@ -34,6 +36,7 @@ class _customerState extends State<customer> {
   final pincode = TextEditingController();
   List statelist = [];
   List districtslist = [];
+  List arealist_ = [];
   List areafinallist_ = [];
   @override
   File? _image;
@@ -43,16 +46,27 @@ class _customerState extends State<customer> {
   GlobalKey<FormState> dealerkey_ = GlobalKey<FormState>();
 
   void initState() {
+    setState(() {
+      custbutton = true;
+    });
+    temp();
     // TODO: implement initState
+    statelist_();
     // territory_list();
+  }
+
+  temp() async {
+    SharedPreferences Autho = await SharedPreferences.getInstance();
+    print(Autho.getString('token'));
   }
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFFEB455F),
+        automaticallyImplyLeading: false,
+        centerTitle: true,
         title: Text(
-          'Dealer Creation',
+          'Customer Creation',
           style: GoogleFonts.poppins(
             textStyle: const TextStyle(
                 fontSize: 20, letterSpacing: .2, color: Colors.white),
@@ -69,7 +83,6 @@ class _customerState extends State<customer> {
               child: Column(
                 children: [
                   TextFormField(
-                    
                     textCapitalization: TextCapitalization.characters,
                     controller: customername,
                     validator: (value) {
@@ -84,12 +97,12 @@ class _customerState extends State<customer> {
                             BorderSide(width: 1, color: Color(0xFF808080)),
                       ),
                       // border: OutlineInputBorder(),
-                      focusedBorder: UnderlineInputBorder(
-                        // borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide:
-                            BorderSide(color: Color(0xFFEB455F), width: 2.0),
+
+                      prefixIcon: Icon(
+                        PhosphorIcons.user,
+                        color: Colors.grey,
                       ),
-                      labelText: "Dealer Name",
+                      labelText: "Customer Name",
                       // hintText: "Enter dealer name"
                     ),
                   ),
@@ -117,10 +130,14 @@ class _customerState extends State<customer> {
                       ),
                       counterText: "",
                       // border: OutlineInputBorder(),
-                      focusedBorder: UnderlineInputBorder(
-                        // borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide:
-                            BorderSide(color: Color(0xFFEB455F), width: 2.0),
+                      // focusedBorder: UnderlineInputBorder(
+                      //     // borderRadius: BorderRadius.all(Radius.circular(8)),
+                      //     //   borderSide:
+                      //     //       BorderSide(color: Color(0xFFEB455F), width: 2.0),
+                      //     ),
+                      prefixIcon: Icon(
+                        PhosphorIcons.phone,
+                        color: Colors.grey,
                       ),
                       labelText: "Mobile Number",
                       // hintText: "Enter dealer mobile number"
@@ -151,10 +168,10 @@ class _customerState extends State<customer> {
                             BorderSide(width: 1, color: Color(0xFF808080)),
                       ),
                       // border: OutlineInputBorder(),
-                      focusedBorder: UnderlineInputBorder(
-                        // borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide:
-                            BorderSide(color: Color(0xFFEB455F), width: 2.0),
+
+                      prefixIcon: Icon(
+                        PhosphorIcons.door,
+                        color: Colors.grey,
                       ),
                       labelText: "Door No",
                       // hintText: "Enter door no"
@@ -179,9 +196,12 @@ class _customerState extends State<customer> {
                       ),
                       // border: OutlineInputBorder(),
                       focusedBorder: UnderlineInputBorder(
-                        // borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide:
-                            BorderSide(color: Color(0xFFEB455F), width: 2.0),
+                          // borderRadius: BorderRadius.all(Radius.circular(8)),
+
+                          ),
+                      prefixIcon: Icon(
+                        PhosphorIcons.map_pin,
+                        color: Colors.grey,
                       ),
                       labelText: "Street",
                       // hintText: "Enter street"
@@ -214,7 +234,7 @@ class _customerState extends State<customer> {
                     ),
                     onSuggestionTap: (x) {
                       FocusScope.of(context).unfocus();
-                      // territory_list(dealerstate.text);
+                      territory_list(state.text);
                     },
                     searchInputDecoration: const InputDecoration(
                       enabledBorder: UnderlineInputBorder(
@@ -222,10 +242,10 @@ class _customerState extends State<customer> {
                             BorderSide(width: 1, color: Color(0xFF808080)),
                       ),
                       // border: OutlineInputBorder(),
-                      focusedBorder: UnderlineInputBorder(
-                        // borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide:
-                            BorderSide(color: Color(0xFFEB455F), width: 2.0),
+
+                      prefixIcon: Icon(
+                        PhosphorIcons.map_pin,
+                        color: Colors.grey,
                       ),
                       labelText: "State",
                       // hintText: "State"
@@ -252,12 +272,12 @@ class _customerState extends State<customer> {
                     marginColor: Colors.white,
                     onSuggestionTap: (x) {
                       FocusScope.of(context).unfocus();
-                      // for (int g = 0; g < arealist_.length; g++) {
-                      //   print(arealist_[g][districts.text]);
-                      //   setState(() {
-                      //     areafinallist_ = (arealist_[g][districts.text]);
-                      //   });
-                      // }
+                      for (int g = 0; g < arealist_.length; g++) {
+                        print(arealist_[g][districts.text]);
+                        setState(() {
+                          areafinallist_ = (arealist_[g][districts.text]);
+                        });
+                      }
                       // print(districts.text);
                     },
                     textInputAction: TextInputAction.next,
@@ -272,10 +292,10 @@ class _customerState extends State<customer> {
                             BorderSide(width: 1, color: Color(0xFF808080)),
                       ),
                       // border: OutlineInputBorder(),
-                      focusedBorder: UnderlineInputBorder(
-                        // borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide:
-                            BorderSide(color: Color(0xFFEB455F), width: 2.0),
+
+                      prefixIcon: Icon(
+                        PhosphorIcons.map_pin,
+                        color: Colors.grey,
                       ),
                       labelText: "District",
                       // hintText: "Select District"
@@ -302,7 +322,7 @@ class _customerState extends State<customer> {
                     marginColor: Colors.white,
                     onSuggestionTap: (x) {
                       FocusScope.of(context).unfocus();
-                      // pincode_text.text = dealerarea.text.split("-").last;
+                      pincode.text = area.text.split("-").last;
                     },
                     textInputAction: TextInputAction.next,
                     hasOverlay: false,
@@ -316,10 +336,10 @@ class _customerState extends State<customer> {
                             BorderSide(width: 1, color: Color(0xFF808080)),
                       ),
                       // border: OutlineInputBorder(),
-                      focusedBorder: UnderlineInputBorder(
-                        // borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide:
-                            BorderSide(color: Color(0xFFEB455F), width: 2.0),
+
+                      prefixIcon: Icon(
+                        PhosphorIcons.map_pin_line,
+                        color: Colors.grey,
                       ),
                       labelText: "Area",
                       // hintText: "Select Area"
@@ -345,10 +365,15 @@ class _customerState extends State<customer> {
                       ),
                       // border: OutlineInputBorder(),
                       focusedBorder: UnderlineInputBorder(
-                        //                           // borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide:
-                            BorderSide(color: Color(0xFFEB455F), width: 2.0),
+                          //                           // borderRadius: BorderRadius.all(Radius.circular(8)),
+                          // borderSide:
+                          //     BorderSide(color: Color(0xFFEB455F), width: 2.0),
+                          ),
+                      prefixIcon: Icon(
+                        PhosphorIcons.list_numbers,
+                        color: Colors.grey,
                       ),
+
                       labelText: "Pincode",
                       // hintText: "Pincode"
                     ),
@@ -369,12 +394,23 @@ class _customerState extends State<customer> {
                                   RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18.0),
                       ))),
-                      onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          print("object");
-                        }
-                      },
-                      child: const Text('  Log in  '),
+                      onPressed: custbutton
+                          ? () {
+                              if (dealerkey_.currentState!.validate()) {
+                                customercreation(
+                                    customername.text,
+                                    mobilenumber.text,
+                                    doorno.text,
+                                    city.text,
+                                    state.text,
+                                    districts.text,
+                                    area.text,
+                                    pincode.text);
+                                print("object");
+                              }
+                            }
+                          : null,
+                      child: const Text('  Submit  '),
                     ),
                   ),
                 ],
@@ -382,5 +418,138 @@ class _customerState extends State<customer> {
             )),
       ),
     );
+  }
+
+  statelist_() async {
+    print("check");
+    try {
+      Dio dio = Dio();
+      SharedPreferences Autho = await SharedPreferences.getInstance();
+
+      dio.options.headers = {
+        "Authorization": Autho.getString('token') ?? '',
+      };
+
+      Response response = await dio
+          .get("${dotenv.env['API_URL']}/api/method/oxo.custom.api.state_list");
+      print((response.data["message"]));
+      setState(() {
+        statelist = (response.data["state"]);
+      });
+      print(response.data);
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response!.data);
+      } else {
+        print(e.message);
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  territory_list(state) async {
+    print("check");
+    try {
+      Dio dio = Dio();
+      SharedPreferences Autho = await SharedPreferences.getInstance();
+
+      dio.options.headers = {
+        "Authorization": Autho.getString('token') ?? '',
+      };
+
+      Response response = await dio.get(
+          "${dotenv.env['API_URL']}/api/method/oxo.custom.api.territory",
+          queryParameters: {"state": state});
+      // print((response.data["message"]));
+      print((response.data["State"]));
+
+      print(
+          "-----------------------------------------------------------------------------------------------");
+      print((response.data["Area"]));
+      setState(() {
+        districtslist = response.data["State"];
+        arealist_ = response.data["Area"];
+      });
+      print(response.data);
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response!.data);
+      } else {
+        print(e.message);
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  customercreation(customername, mobilenumber, doorno, city, state, district,
+      area, pincode) async {
+    try {
+      setState(() {
+        custbutton = false;
+      });
+      Dio dio = Dio();
+
+      SharedPreferences Autho = await SharedPreferences.getInstance();
+
+      dio.options.headers = {
+        "Authorization": Autho.getString('token') ?? '',
+      };
+      final params = {
+        'full_name': customername,
+        'phone_number': mobilenumber,
+        'doorno': doorno,
+        'address': city,
+        'districts': district,
+        'territory': area,
+        'Manual_Data': '',
+        'user': Autho.getString('full_name').toString(),
+        'pincode': pincode,
+        "state": state
+      };
+
+      // Make the request
+      final response = await dio.get(
+          "${dotenv.env['API_URL']}/api/method/oxo.custom.api.new_customer",
+          queryParameters: params);
+
+      // Print the response
+      if (response.statusCode == 200) {
+        setState(() {
+          custbutton = true;
+        });
+        cleardata();
+        var responseData = response.data;
+        Fluttertoast.showToast(
+            msg: responseData["message"].toString(),
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Color(0xFF273b69),
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+      print(response.data);
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response!.data);
+      } else {
+        print(e.message);
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  cleardata() {
+    customername.clear();
+    mobilenumber.clear();
+    doorno.clear();
+    city.clear();
+    state.clear();
+    districts.clear();
+    area.clear();
+    pincode.clear();
   }
 }

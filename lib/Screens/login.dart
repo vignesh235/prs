@@ -4,8 +4,10 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:prs/Screens/bottomnavigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -185,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
     var data = {"mobile": mobilenumber, "password": password};
 
     Response response = await dio.get(
-        "http://demo14prime.thirvusoft.co.in//api/method/oxo.custom.api.login",
+        "https://demo14prime.thirvusoft.co.in//api/method/oxo.custom.api.login",
         queryParameters: data);
     var responseData = response.data;
     print(response.data["token"]);
@@ -205,7 +207,13 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         loding = false;
       });
-      Navigator.pushNamed(context, '/bottomsheeet');
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => bottomnavigation(),
+        ),
+        (route) => false,
+      );
     } else {
       setState(() {
         loding = false;

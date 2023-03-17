@@ -2,7 +2,9 @@ import 'package:animated_widgets/widgets/custom_animated.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:prs/Screens/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Dashboard extends StatefulWidget {
@@ -28,6 +30,22 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        title: const Text(' Dashboard '),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(
+              PhosphorIcons.sign_out,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              _delete(context);
+            },
+          )
+        ],
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -61,7 +79,7 @@ class _DashboardState extends State<Dashboard> {
               animationDuration: 1200,
               radius: 60.0,
               lineWidth: 15.0,
-              percent: totalAmountp,
+              percent: totalAmountp / 100,
               center: CustomAnimatedWidget(
                 duration: Duration(milliseconds: 1200),
                 curve: Curves.easeOut,
@@ -69,7 +87,7 @@ class _DashboardState extends State<Dashboard> {
                   //for custom animation, use builders
                   final int displayedDate = (totalAmount * percent).floor();
                   return Text(
-                    " $displayedDate",
+                    "₹" " $displayedDate",
                   );
                 },
               ),
@@ -97,8 +115,11 @@ class _DashboardState extends State<Dashboard> {
       setState(() {
         soCount = data["so_count"];
         totalAmount = data["total_amount"];
+        print(totalAmount);
         value = soCount / 100;
-        totalAmountp = totalAmount / 100000;
+        print(value);
+        totalAmountp = (totalAmount / 1000000.0) * 100;
+
         print(totalAmountp);
       });
 
@@ -112,5 +133,43 @@ class _DashboardState extends State<Dashboard> {
     } catch (e) {
       print(e.toString());
     }
+  }
+
+  void _delete(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: const Text("Please Confirm",
+                style: TextStyle(
+                    fontSize: 20, letterSpacing: .2, color: Color(0xFF2B3467))),
+            content: const Text("Are you sure to logout?",
+                style: TextStyle(
+                    fontSize: 15, letterSpacing: .2, color: Color(0xFF2B3467))),
+            actions: [
+              // The "Yes" button
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("No"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final Autho = await SharedPreferences.getInstance();
+                  print(Autho.getString("token"));
+                  // await token.clear();
+                  await Autho.remove('token');
+                  print(Autho.getString("token"));
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()));
+                },
+                child: const Text("Yes"),
+              ),
+            ],
+          );
+        });
   }
 }

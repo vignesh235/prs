@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 import 'Customer.dart';
+import 'Expensepage.dart';
 
 void main() {
   runApp(bottomnavigation());
@@ -27,10 +28,12 @@ class _bottomnavigationState extends State<bottomnavigation> {
     });
   }
 
+  // ignore: prefer_final_fields
   List<Widget> _widgetOptions = <Widget>[
-    Dashboard(),
-    HomePage(),
-    customer(),
+    const Dashboard(),
+    const HomePage(),
+    const materialrequest(),
+    const customer(),
   ];
   @override
   Widget build(BuildContext context) {
@@ -77,11 +80,27 @@ class _bottomnavigationState extends State<bottomnavigation> {
           ),
           SalomonBottomBarItem(
             icon: Icon(
-              PhosphorIcons.receipt_light,
+              PhosphorIcons.note_pencil,
               size: screenwidth <= 360 ? 20 : 23,
             ),
             title: Text(
-              "Material Request",
+              "Material request",
+              style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                    fontSize: screenwidth <= 360 ? 9 : 10.5,
+                    letterSpacing: .3,
+                    color: Color(0xff19183e)),
+              ),
+            ),
+            selectedColor: Color(0xffE19183E),
+          ),
+          SalomonBottomBarItem(
+            icon: Icon(
+              PhosphorIcons.user_plus_light,
+              size: screenwidth <= 360 ? 20 : 23,
+            ),
+            title: Text(
+              "Customer",
               style: GoogleFonts.poppins(
                 textStyle: TextStyle(
                     fontSize: screenwidth <= 360 ? 9 : 10.5,

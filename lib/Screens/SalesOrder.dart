@@ -205,9 +205,7 @@ class _HomePageState extends State<HomePage> {
                                                   SizedBox(
                                                       height: 25,
                                                       width: 60,
-                                                      child: 
-                                                      
-                                                      TextFormField(
+                                                      child: TextFormField(
                                                         decoration:
                                                             const InputDecoration(
                                                           hintText: "Qty",
@@ -268,8 +266,7 @@ class _HomePageState extends State<HomePage> {
                                                             print(selectitem);
                                                           });
                                                         },
-                                                      )
-                                                      ),
+                                                      )),
                                                   IconButton(
                                                       color: const Color(
                                                           0xff273b69),
@@ -361,11 +358,11 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(
                       height: 25,
                     ),
-                    Text("Total Amount: $totalamount_"),
-                    Text("Total Amount${finaltotalamount_.toStringAsFixed(2)}"),
-                    Visibility(
-                        visible: total_amount_visible,
-                        child: Text("Total Amount:  $totalamount"))
+                    Text(
+                        "Total Amount : ${finaltotalamount_.toStringAsFixed(2)}"),
+                    // Visibility(
+                    //     visible: total_amount_visible,
+                    //     child: Text("Total Amount:  $totalamount"))
                   ],
                 )),
           ],

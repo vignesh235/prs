@@ -8,6 +8,7 @@ bool custbutton = true;
 
 final customers = TextEditingController();
 final date = TextEditingController();
+final requireddate = TextEditingController();
 final paidamount_ = TextEditingController();
 List customerlist_ = [];
 var totalamount = "";
